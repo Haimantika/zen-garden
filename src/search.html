@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./output.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <html data-theme="cupcake"></html>
+</head>
+<body>
+  <div class="hero bg-base-200 min-h-screen">
+    <div class="hero-content text-center">
+      <div class="max-w-md">
+        <h1 class="text-5xl font-bold">Let's take care of your plant babies 🫶🏻</h1>
+        <p class="py-6">
+            Search for your favorite plant and get all the information you need. 🌱 
+        </p>
+        <form id="plantForm">
+          <label class="input input-bordered flex items-center gap-2">
+            <input name="plantName" type="text" class="grow" placeholder="Enter plant name" required />
+            <button type="submit" class="btn">
+              Get care routine!
+            </button>
+          </label>
+        </form>
+        <div id="result"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById('plantForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      try {
+        const response = await fetch('/care-routine', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ plantName: formData.get('plantName') })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        document.getElementById('result').innerText = data.careRoutine || 'No care routine found. Please try a different plant name.';
+      } catch (error) {
+        console.error('Fetch error:', error);
+        document.getElementById('result').innerText = 'Error fetching care routine. Please try again.';
+      }
+    });
+
+  </script>
+</body>
+</html>
+
+
+
