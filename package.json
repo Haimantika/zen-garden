@@ -4,6 +4,8 @@
   "description": "",
   "main": "tailwind.config.js",
   "scripts": {
+    "start": "node src/backend/app.js",
+    "build": "echo 'Skipping build step'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,7 +15,6 @@
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "nodemailer": "^6.9.14",
     "openai": "^4.52.3"
   }
 }
