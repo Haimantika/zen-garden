@@ -5,7 +5,7 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '.')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -52,4 +52,8 @@ app.post('/api/care-routine', async (req, res) => {
     }
 });
 
-module.exports = app;
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
