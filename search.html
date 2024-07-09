@@ -38,7 +38,7 @@
       resultDiv.innerHTML = '<span class="loading loading-dots loading-md"></span>'; // Show loading indicator
 
       try {
-        const response = await fetch('/care-routine', {
+        const response = await fetch('/api/care-routine', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
