@@ -1,56 +1,61 @@
 const express = require('express');
-const path = require('path');
-const axios = require('axios');
 const serverless = require('serverless-http');
+const axios = require('axios');
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-app.post('/api/care-routine', async (req, res) => {
-    const plantName = req.body.plantName;
-    console.log("Sending request to OpenAI with plant name:", plantName);
-    try {
-        console.time("Open Api Call")
-        const apiRequest = {
-            model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: `I have ${plantName}. Can you share a full care routine for this plant in 100 words?` }]
-        };
-        console.log("Request body to OpenAI:", JSON.stringify(apiRequest));
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        const response = await axios.post(OPENAI_API_URL, apiRequest, {
-            headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
-            }, 
-            timeout: 25000 
-        });
-        console.timeEnd("OpenAPI Call")
-        console.log("Received response from OpenAI:", JSON.stringify(response.data));
-        
-        if (response.data.choices && response.data.choices.length > 0) {
-            const choice = response.data.choices[0];
-            if (choice.message && choice.message.content) {
-                const textContent = choice.message.content;
-                if (textContent.trim() !== "") {
-                    res.json({ careRoutine: textContent });
-                } else {
-                    res.status(404).json({ error: "No care routine found" });
-                }
-            } else {
-                res.status(404).json({ error: "No care routine found" });
-            }
-        } else {
-            res.status(404).json({ error: "No care routine found" });
-        }
-    } catch (error) {
-        console.error('Error:', error.response ? error.response.data : error.message);
-        res.status(500).json({ error: 'Error processing your request', details: error.message });
+async function getOpenAIResponse(plantName) {
+  const response = await axios.post(OPENAI_API_URL, {
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: `I have ${plantName}. Can you share a full care routine for this plant in 100 words?` }]
+  }, {
+    headers: {
+      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      'Content-Type': 'application/json'
     }
+  });
+  return response.data.choices[0].message.content;
+}
+
+app.post('/api/care-routine', async (req, res) => {
+  const plantName = req.body.plantName;
+  console.log(`Received request for plant: ${plantName}`);
+
+  let retries = 0;
+  const maxRetries = 5;
+  const initialWaitTime = 2000;
+
+  while (retries < maxRetries) {
+    try {
+      console.time('OpenAI API call');
+      const careRoutine = await getOpenAIResponse(plantName);
+      console.timeEnd('OpenAI API call');
+
+      if (careRoutine) {
+        return res.json({ careRoutine });
+      } else {
+        throw new Error("No care routine found");
+      }
+    } catch (error) {
+      console.error(`Attempt ${retries + 1} failed:`, error.message);
+      retries++;
+      if (retries >= maxRetries) {
+        return res.status(500).json({ error: 'Failed to get care routine after multiple attempts', details: error.message });
+      }
+      await wait(initialWaitTime * Math.pow(2, retries - 1)); // Exponential backoff
+    }
+  }
+});
+
+// For testing the API is running
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello from the API!' });
 });
 
 module.exports = serverless(app);
