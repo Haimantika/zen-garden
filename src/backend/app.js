@@ -6,13 +6,16 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-console.log('Serving static files from:', path.join(__dirname, '../src'));
+// console.log('Serving static files from:', path.join(__dirname, '../'));
 app.use(express.static(path.join(__dirname, '../src')));
+
+app.get('/', (req, res) => { 
+    res.sendFile(path.join(__dirname, '../index.html'));
+});
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-app.get('/search', (req, res) => {
-    // Adjust the path according to your project structure
+app.get('/search', (req, res) => { 
     res.sendFile(path.join(__dirname, '../search.html'));
 });
 
@@ -23,7 +26,7 @@ app.post('/care-routine', async (req, res) => {
     try {
         const apiRequest = {
             model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: `I have ${plantName}. Can you share a full care routine for this plant in 100 words?` }]
+            messages: [{ role: "user", content: `I have ${plantName}. Can you share a full care routine for this plant?` }]
         };
         console.log("Request body to OpenAI:", JSON.stringify(apiRequest));
 
@@ -59,9 +62,8 @@ app.post('/care-routine', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3005;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-
 
