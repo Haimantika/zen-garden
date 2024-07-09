@@ -23,7 +23,7 @@ app.post('/care-routine', async (req, res) => {
     try {
         const apiRequest = {
             model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: `I have ${plantName}. Can you share a full care routine for this plant?` }]
+            messages: [{ role: "user", content: `I have ${plantName}. Can you share a full care routine for this plant in 100 words?` }]
         };
         console.log("Request body to OpenAI:", JSON.stringify(apiRequest));
 
@@ -59,7 +59,7 @@ app.post('/care-routine', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3005;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

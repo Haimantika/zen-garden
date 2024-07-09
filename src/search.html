@@ -17,14 +17,16 @@
             Search for your favorite plant and get all the information you need. 🌱 
         </p>
         <form id="plantForm">
-          <label class="input input-bordered flex items-center gap-2">
+          <label class="input input-bordered flex items-center gap-2 mb-6 w-full">
             <input name="plantName" type="text" class="grow" placeholder="Enter plant name" required />
             <button type="submit" class="btn">
               Get care routine!
             </button>
           </label>
         </form>
-        <div id="result"></div>
+        <div id="result" class="mt-4">
+          <!-- Results and the button will be dynamically added here -->
+        </div>
       </div>
     </div>
   </div>
@@ -32,6 +34,9 @@
     document.getElementById('plantForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const formData = new FormData(this);
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '<span class="loading loading-dots loading-md"></span>'; // Show loading indicator
+
       try {
         const response = await fetch('/care-routine', {
           method: 'POST',
@@ -46,16 +51,32 @@
         }
 
         const data = await response.json();
-        document.getElementById('result').innerText = data.careRoutine || 'No care routine found. Please try a different plant name.';
+        if (data.careRoutine) {
+          resultDiv.innerHTML = `<div class="card glass w-full shadow-xl">
+                                    <div class="card-body">
+                                      <h2 class="card-title">Care routine for ${formData.get('plantName')}:</h2>
+                                      <p>${data.careRoutine}</p>
+                                    </div>
+                                  </div>
+                                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSfLPYf0JZrAAeNRdYso5hybzGatM7vHlNUP0xwW5USlYdpzMQ/viewform?usp=sf_link" class="btn glass mt-4">Join the waitlist for more features</a>
+                                  `;
+        } else {
+          resultDiv.innerText = 'No care routine found. Please try a different plant name.';
+        }
       } catch (error) {
         console.error('Fetch error:', error);
-        document.getElementById('result').innerText = 'Error fetching care routine. Please try again.';
+        resultDiv.innerText = 'Error fetching care routine. Please try again.';
       }
     });
-
   </script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
