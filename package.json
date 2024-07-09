@@ -4,7 +4,7 @@
   "description": "",
   "main": "tailwind.config.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node api/server.js"
   },
   "keywords": [],
   "author": "",
