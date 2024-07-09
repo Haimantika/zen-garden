@@ -6,13 +6,11 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-console.log('Serving static files from:', path.join(__dirname, '../src'));
 app.use(express.static(path.join(__dirname, '../src')));
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 app.get('/search', (req, res) => {
-    // Adjust the path according to your project structure
     res.sendFile(path.join(__dirname, '../search.html'));
 });
 

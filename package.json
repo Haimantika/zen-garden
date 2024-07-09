@@ -4,6 +4,8 @@
   "description": "",
   "main": "tailwind.config.js",
   "scripts": {
+    "start": "node src/backend/app.js",
+    "build": "echo 'Skipping build step'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
